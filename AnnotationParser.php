@@ -16,13 +16,18 @@ abstract class AnnotationParser {
      * @return \Annotation
      */
     static function parse($docComment) {
-        $text = self::uncomment($docComment);  
+        $text = self::uncomment($docComment);
         $annotations = self::retrieveAnnotations($text);
         $map = [];
         forEach ($annotations as $annotation) {
             $parameters = [];
             $hasParameters = preg_match('/(?<=' . $annotation . '[\(])[\w\W]*?(?=[\)])/', $text, $parameters);
-            $map[$annotation] = $hasParameters ? json_decode($parameters[0]) : null;
+            if ($hasParameters) {
+                $quotedJson = preg_replace("/([{,])(\s*)([A-Za-z0-9_\-]+?)\s*:/", "$1\"$3\":", $parameters[0]);
+                $map[$annotation] = json_decode($quotedJson);
+            } else {
+                $map[$annotation] = null;
+            }
         }
         return new Annotation($map);
     }
