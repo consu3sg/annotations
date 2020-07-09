@@ -38,7 +38,7 @@ class Annotation {
      * @return type
      */
     public function contains($annotation) {
-        return in_array($annotation, $this->map) !== -1;
+        return in_array($annotation, array_keys($this->map));
     }
 
 }
